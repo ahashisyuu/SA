@@ -7,9 +7,9 @@ from keras.layers import Input, Dense, GRU, Reshape, Embedding
 
 
 class ExampleModel:
-    def __init__(self, embedding_matrix, max_len, category_num = 4,
+    def __init__(self, embedding_matrix, max_len, category_num=4,
                  dropout=0.2, optimizer='RMSprop',
-                 loss='categorical_crossentropy', metrics=['acc'],
+                 loss='categorical_crossentropy', metrics=None,
                  **kwargs):
         self.embedding_matrix = embedding_matrix  # 嵌入矩阵
         self.max_len = max_len  # 最大文档长度
@@ -36,25 +36,29 @@ class ExampleModel:
         # self.feature = Input(shape=[self.max_len,], dtype='float32')
 
     def embedding_vector(self):
-        self.embedded_doc = Embedding(input_dim=self.embedding_matrix.shape[0],
-                                      output_dim=self.embedding_matrix.shape[1],
-                                      mask_zero=True,
-                                      weights=self.embedding_matrix)
+        # self.embedded_doc = Embedding(input_dim=self.embedding_matrix.shape[0],
+        #                               output_dim=self.embedding_matrix.shape[1],
+        #                               mask_zero=True,
+        #                               weights=self.embedding_matrix)
+        pass
 
     def modeling(self):
         """
         模型运算主体
         输入：self.embedded_sentence: 已经嵌入的词向量序列，形状为(Batch_size, max_len, demensions)
-        输出：self.output: 类别预测，为已经过softmax运算得到的概率值，形状为(Batch_size, category_num)
+        输出：self.output: 类别预测，为经过softmax运算得到的概率值，形状为(Batch_size, category_num)
+
         """
 
-        # self.output = Dense(self.category_num, activation='softmax')(xxx)
+        self.output = Dense(self.category_num, activation='softmax')(self.document)
         pass
 
-    def complie_model(self):
+    def complie_model(self, need_summary=False):
         self.model = Model(inputs=[self.document], outputs=[self.output])
         self.model.compile(optimizer=self.optimizer, loss=self.loss,
                            metrics=self.metrics)
+        if need_summary:
+            self.model.summary()
 
     def train_model(self, train_data, train_label,
                     batch_size=64, epochs=30, verbose=1,
@@ -68,7 +72,8 @@ class ExampleModel:
             self.model.load_weight(filepath)
 
         if callbacks is None:
-            save_path = './model_' + self.model.name
+            save_path = './model_' + self.model.name \
+                        + '/epoch{epoch}_loss{loss}_valloss{val_loss}_f1{val_f1_score}.model'
             callbacks = [ModelCheckpoint(filepath=save_path, save_weights_only=True),
                          TensorBoard(write_graph=True, histogram_freq=0)]
 
@@ -81,6 +86,13 @@ class ExampleModel:
 
     def predict(self, test_data, batch_size=128, verbose=1):
         return self.model.predict(test_data, batch_size=batch_size, verbose=verbose)
+
+    def load_weights(self, filepath):
+        self.model.load_weight(filepath)
+
+
+if __name__ == "__main__":
+    globals()
 
 
 

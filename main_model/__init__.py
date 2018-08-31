@@ -1,4 +1,4 @@
-import six
+
 
 
 class test:

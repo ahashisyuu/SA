@@ -4,9 +4,7 @@
 （1）**rawData**文件夹存的是官网下的原生语料；  
 （2）**data**文件夹是已经处理好的数据文件；  
 （3）**preprocessing**文件夹包含数据预处理的一些文件；  
-（3）要得到处理好的数据可以直接运行**preprocessing**文件夹内的preprocessing.py文件，也可以在当前命令行运行以下命令：  
-
-    python run.py --mode prepro  
+（3）要得到处理好的数据可以直接运行**preprocessing**文件夹内的preprocessing.py文件.
 
 ### 关于模型文件
 首先按模板样式在**models**文件夹内把模型文件写好，再在**main_model**文件夹写他相对应的main文件，同样按照模板写。
