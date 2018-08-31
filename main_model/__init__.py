@@ -1,9 +1,8 @@
+from models import *
+from main_model.MainModel import MainModel
 
-
-
-class test:
-    def __init__(self):
-        print('test')
+module_objects = globals()
+module_objects.pop('MainModel')
 
 
 def get(model_name):
@@ -11,7 +10,7 @@ def get(model_name):
     return module_objects.get(model_name)
 
 
-module_objects = globals()
+
 
 
 

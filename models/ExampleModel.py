@@ -91,6 +91,10 @@ class ExampleModel:
     def load_weights(self, filepath):
         self.model.load_weight(filepath)
 
+    @property
+    def name(self):
+        return self.model.name
+
 
 if __name__ == "__main__":
     globals()
