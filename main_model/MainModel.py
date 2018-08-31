@@ -62,6 +62,10 @@ class MainModel:
 
         return output_array
 
+    def evaluate(self, load_best_model=True, model_path=None):
+        output_array = self.predict(load_best_model=load_best_model, model_path=model_path)
+
+
 
 
 
