@@ -20,7 +20,6 @@ def check_models(path):
     with open(os.path.join(path, '__init__.py'), 'rb') as fr:
         models_list = fr.readlines()
     models_list = [string.strip() for string in models_list]
-    print(models_list)
     list_dir = os.listdir(path)
     with open(os.path.join(path, '__init__.py'), 'a') as fa:
         for name in list_dir:
@@ -29,6 +28,28 @@ def check_models(path):
                 line = 'from models.' + name[:-3] + ' import *'
 
                 for li in models_list:
+                    if li.startswith(line.encode(encoding='utf-8')) is True:
+                        tag = True
+                        break
+
+                if tag is False:
+                    fa.write(line)
+                    fa.write('\n')
+
+
+def check_layers(path):
+    # open __init__.py file for get all 'import'
+    with open(os.path.join(path, '__init__.py'), 'rb') as fr:
+        layers_list = fr.readlines()
+    layers_list = [string.strip() for string in layers_list]
+    list_dir = os.listdir(path)
+    with open(os.path.join(path, '__init__.py'), 'a') as fa:
+        for name in list_dir:
+            if '__' not in name:
+                tag = False
+                line = 'from layers.' + name[:-3] + ' import *'
+
+                for li in layers_list:
                     if li.startswith(line.encode(encoding='utf-8')) is True:
                         tag = True
                         break
