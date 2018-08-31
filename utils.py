@@ -2,13 +2,13 @@ import pickle as pkl
 import pandas as pd
 
 
-def load_vocab(filepath):
+def load_embedding_matrix(filepath):
     with open(filepath, 'rb') as fr:
-        vocab = pkl.load(fr)
-    return vocab
+        embedding_matrix = pkl.load(fr)
+    return embedding_matrix
 
 
-def load_data(embedding_matrix):
+def load_data(filepath):
     with open(filepath, 'rb') as fr:
         data = pkl.load(fr)
     return data

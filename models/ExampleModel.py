@@ -29,7 +29,8 @@ class ExampleModel:
         self.creat_input()
         self.embedding_vector()
         self.modeling()  # 模型的运算主体，所有运算全部定义在这个函数下
-        self.complie_model()
+        need_summary = kwargs.get('need_summary', False)
+        self.complie_model(need_summary=need_summary)
 
     def creat_input(self):
         self.document = Input(shape=[self.max_len, ], dtype='int32')
