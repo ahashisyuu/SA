@@ -11,13 +11,13 @@ class ExampleModel:
                  dropout=0.2, optimizer='RMSprop',
                  loss='categorical_crossentropy', metrics=None,
                  **kwargs):
-        self.embedding_matrix = embedding_matrix  # 嵌入矩阵
-        self.max_len = max_len  # 最大文档长度
-        self.category_num = category_num  # 总的类别数量
+        self.embedding_matrix = embedding_matrix    # 嵌入矩阵
+        self.max_len = max_len                      # 最大文档长度
+        self.category_num = category_num            # 总的类别数量
         self.dropout = dropout
         self.optimizer = optimizer
         self.loss = loss
-        self.metrics = metrics  # 评价方法，必需是列表
+        self.metrics = metrics                      # 评价方法，必需是列表
 
         # =====  一些必要的层初始化  =====
         self.document = None
@@ -28,7 +28,7 @@ class ExampleModel:
 
         self.creat_input()
         self.embedding_vector()
-        self.modeling()  # 模型的运算主体，所有运算全部定义在这个函数下
+        self.modeling()                             # 模型的运算主体，所有运算全部定义在这个函数下
         self.complie_model()
 
     def creat_input(self):
