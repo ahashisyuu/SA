@@ -8,7 +8,7 @@ def load_vocab(filepath):
     return vocab
 
 
-def load_data(filepath):
+def load_data(embedding_matrix):
     with open(filepath, 'rb') as fr:
         data = pkl.load(fr)
     return data
