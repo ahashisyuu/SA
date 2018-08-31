@@ -8,7 +8,7 @@ class test:
 
 def get(model_name):
     assert isinstance(model_name, str)
-    assert callable(model_name)
+    return module_objects.get(model_name)
 
 
 module_objects = globals()
