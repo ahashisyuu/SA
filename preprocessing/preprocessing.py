@@ -58,8 +58,18 @@ def tokenizor():
     trainingset.to_csv(os.path.join(new_path, 'trainingset.csv'))
     validationset.to_csv(os.path.join(new_path, 'validationset.csv'))
     testa.to_csv(os.path.join(new_path, 'testa.csv'))
+    return trainingset, validationset, testa
 
 
 def preprocessing(args):
+    """
+        整合成如下纯列表形式：[input_list, output_list],
+        input_list为输入列表，每一项为numpy矩阵的输入；
+        output_list为标记列表，每一项为单个层次对应的类别标记numpy矩阵, test数据output_list为空列表。
+        为了方便分类器选择，要生成一个如{‘层次名’: 序号}的字典，方便训练
+
+    """
+
+
     return None
 

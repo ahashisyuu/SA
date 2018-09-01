@@ -18,10 +18,14 @@ class MainModel:
     def __init__(self, cls, config):
         self.cls = cls
         self.config = config
+        self.arrangement_index = load_data(self.config.map_path).get(self.config.arrangement, 0)
 
     def train(self):
         embedding_matrix = load_embedding_matrix(self.config.matrix_path)
-        char_embedding_matrix = load_embedding_matrix(self.config.char_matrix_path)
+        if self.config.need_char_level:
+            char_embedding_matrix = load_embedding_matrix(self.config.char_matrix_path)
+        else:
+            char_embedding_matrix = None
         trainingset, validationset, _ = load_data(self.config.data_path)
 
         model = self.cls(embedding_matrix=embedding_matrix,
@@ -36,7 +40,8 @@ class MainModel:
                          need_char_level=self.config.need_char_level,
                          need_summary=self.config.need_summary)
 
-        model.train_model(trainingset[0], trainingset[1],
+        validationset = [validationset[0], validationset[1][self.arrangement_index]]
+        model.train_model(trainingset[0], trainingset[1][self.arrangement_index],
                           batch_size=self.config.batch_size,
                           valid_batch_size=self.config.valid_batch_size,
                           epochs=self.config.epochs,
@@ -49,6 +54,7 @@ class MainModel:
         embedding_matrix = load_embedding_matrix(self.config.matrix_path)
         char_embedding_matrix = load_embedding_matrix(self.config.char_matrix_path)
         _, validationset, testa = load_data(self.config.data_path)
+        validationset = [validationset[0], validationset[1][self.arrangement_index]]
 
         model = self.cls(embedding_matrix=embedding_matrix,
                          char_embedding_matrix=char_embedding_matrix,

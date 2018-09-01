@@ -94,7 +94,7 @@ class ExampleModel:
         if self.need_summary:
             self.model.summary()
 
-    def train_model(self, train_data, train_label,
+    def train_model(self, train_data, train_label, arrangement,
                     batch_size=64, valid_batch_size=128, epochs=30, verbose=1,
                     validation_data=None, callbacks=None, monitor='val_loss',
                     load_model_name=None):
@@ -106,7 +106,7 @@ class ExampleModel:
             self.model.load_weight(filepath)
 
         if callbacks is None:
-            save_path = './save_model_' + self.model.name \
+            save_path = './save_model_' + self.model.name + arrangement \
                         + '/epoch{epoch}_loss{loss:.4f}_valloss{val_loss:.4f}' \
                           '_fmeasure{fmeasure:.4f}_valacc{val_acc:.4f}.model'
             callbacks = [TensorBoard(write_graph=True, histogram_freq=0),

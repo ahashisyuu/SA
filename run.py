@@ -6,7 +6,7 @@ import argparse
 from main_model.MainModel import MainModel
 from config import Config
 from preprocessing.preprocessing import preprocessing
-from utils import check_models, check_layers, save_results
+from utils import check_models, check_layers, save_results, load_data
 
 config = Config()
 
@@ -26,7 +26,9 @@ def parse_args():
     parser.add_argument('--matrix_path', default=os.path.abspath(config.matrix_path))
     parser.add_argument('--char_matrix_path', default=os.path.abspath(config.char_matrix_path))
     parser.add_argument('--data_path', default=os.path.abspath(config.data_path))
+    parser.add_argument('--map_path', default=os.path.abspath(config.map_path))
 
+    parser.add_argument('--arrangement', type=str, default=config.arrangement)
     parser.add_argument('--max_len', type=int, default=config.max_len)
     parser.add_argument('--max_char_len', type=int, default=config.max_char_len)
     parser.add_argument('--category_num', type=int, default=config.category_num)
