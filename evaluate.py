@@ -32,7 +32,7 @@ def categorical_prf(y_true, y_pred):
     assert class_num == y_pred.shape[1]
     y_true_index = y_true.argmax(axis=-1)
 
-    # 将class_num的多分类分为class_num个2分类组合
+    # 将class_num的多分类分为class_num个2分类组合并计算PRF
     group_prf = []
     group_f = 0
     for i in range(class_num):
@@ -42,9 +42,11 @@ def categorical_prf(y_true, y_pred):
         group_prf.append(prf)
         group_f += prf[2]
 
-    group_f /= 4
+    group_f /= class_num
 
-    return group_prf, group_f
+    acc = (y_pred_index == y_true_index).astype('int32').sum()
+
+    return group_prf, group_f, acc
 
 
 

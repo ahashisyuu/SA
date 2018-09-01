@@ -6,7 +6,7 @@
 （3）**preprocessing**文件夹包含数据预处理的一些文件；  
 （3）要得到处理好的数据可以直接运行**preprocessing**文件夹内的preprocessing.py文件,或者在当前命令行执行以下指令：  
 
-    python run.py --mode pre   
+    python run.py --mode prepare   
 
 ### 关于模型文件
 首先按模板样式在**models**文件夹内把模型文件写好，再在**main_model**文件夹写他相对应的main文件，同样按照模板写。

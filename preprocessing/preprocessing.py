@@ -37,6 +37,11 @@ def tokenizor():
     old_path = '../rawData'
     new_path = '../data'
 
+    if not os.path.exists(old_path):
+        os.mkdir(old_path)
+    if not os.path.exists(new_path):
+        os.mkdir(new_path)
+
     trainingset, validationset, testa = load_rawData(old_path)
 
     # 对有标签的数据进行处理
@@ -54,4 +59,7 @@ def tokenizor():
     validationset.to_csv(os.path.join(new_path, 'validationset.csv'))
     testa.to_csv(os.path.join(new_path, 'testa.csv'))
 
+
+def preprocessing(args):
+    return None
 

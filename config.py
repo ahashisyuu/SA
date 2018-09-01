@@ -7,10 +7,12 @@ class Config:
     max_len = 200                                          # 文本最大长度
     max_char_len = 5                                       # 词的最大字数
     category_num = 4                                       # 单个层次的类别数
+    lr = 0.001
     dropout = 0.2
     optimizer = 'RMSprop'
     loss = 'categorical_crossentropy'
     metrics = ['acc']
+    monitor = 'val_loss'
 
     need_char_level = False                                # 是否启用字级向量
     need_summary = False                                   # 是否打印summary信息
@@ -18,8 +20,7 @@ class Config:
     batch_size = 64
     epochs = 50
     verbose = 1
-    last_model = None                                      # 上一次训练到一半的模型，想继续的模型（只用给出模型的文件名）
-
+    model_name = None                                      # 用于预测，评估或者训练的模型名称
 
 
 

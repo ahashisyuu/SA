@@ -1,11 +1,11 @@
 import os
 
 from keras.callbacks import ModelCheckpoint, TensorBoard, LearningRateScheduler
-from keras.engine.training import Model
+from utils import ModelForLoss as Model
 from keras import backend as K
 from keras.layers import Input, Dense, GRU, Reshape, Embedding, concatenate
 
-from utils import learning_rate
+from utils import learning_rate, PRFAcc
 
 
 class ExampleModel:
@@ -90,36 +90,40 @@ class ExampleModel:
             self.model = Model(inputs=[self.document], outputs=[self.output])
         self.model.compile(optimizer=self.optimizer, loss=self.loss,
                            metrics=self.metrics)
+
         if self.need_summary:
             self.model.summary()
 
     def train_model(self, train_data, train_label,
-                    batch_size=64, epochs=30, verbose=1,
-                    validation_data=None, callbacks=None,
+                    batch_size=64, valid_batch_size=128, epochs=30, verbose=1,
+                    validation_data=None, callbacks=None, monitor='val_loss',
                     load_model_name=None):
-        if os.path.exists('./model_' + self.model.name) is False:
-            os.mkdir('./model_' + self.model.name)
+        if os.path.exists('./save_model_' + self.model.name) is False:
+            os.mkdir('./save_model_' + self.model.name)
 
         if load_model_name is not None:
-            filepath = os.path.join('./model_' + self.model.name, load_model_name)
+            filepath = os.path.join('./save_model_' + self.model.name, load_model_name)
             self.model.load_weight(filepath)
 
         if callbacks is None:
-            save_path = './model_' + self.model.name \
-                        + '/epoch{epoch}_loss{loss}_valloss{val_loss}_f1{val_f1_score}.model'
-            callbacks = [ModelCheckpoint(filepath=save_path, save_weights_only=True),
-                         TensorBoard(write_graph=True, histogram_freq=0),
-                         LearningRateScheduler(schedule=learning_rate)]
+            save_path = './save_model_' + self.model.name \
+                        + '/epoch{epoch}_loss{loss:.4f}_valloss{val_loss:.4f}' \
+                          '_fmeasure{fmeasure:.4f}_valacc{val_acc:.4f}.model'
+            callbacks = [TensorBoard(write_graph=True, histogram_freq=0),
+                         LearningRateScheduler(schedule=learning_rate),
+                         PRFAcc(filepath=save_path, monitor=monitor,
+                                batch_size=valid_batch_size,
+                                validation_data=validation_data)]
 
         self.model.fit(train_data, train_label,
                        batch_size=batch_size,
                        epochs=epochs,
                        verbose=verbose,
-                       validation_data=validation_data,
+                       validation_data=None,
                        callbacks=callbacks)
 
-    def predict(self, test_data, batch_size=128, verbose=1):
-        return self.model.predict(test_data, batch_size=batch_size, verbose=verbose)
+    def predict(self, test_data, pre_batch_size=128, verbose=1):
+        return self.model.predict(test_data, batch_size=pre_batch_size, verbose=verbose)
 
     def load_weights(self, filepath):
         self.model.load_weight(filepath)
