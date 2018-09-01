@@ -1,6 +1,9 @@
 import os
 import pickle as pkl
 import pandas as pd
+from keras.callbacks import Callback
+
+from evaluate import categorical_prf
 
 
 def load_embedding_matrix(filepath):
@@ -23,7 +26,7 @@ def check_models(path):
     list_dir = os.listdir(path)
     with open(os.path.join(path, '__init__.py'), 'a') as fa:
         for name in list_dir:
-            if '__' not in name:
+            if '__' not in name and 'Example' not in name:
                 tag = False
                 line = 'from models.' + name[:-3] + ' import *'
 
@@ -57,6 +60,28 @@ def check_layers(path):
                 if tag is False:
                     fa.write(line)
                     fa.write('\n')
+
+
+def learning_rate(epoch, lr):
+    return lr
+
+
+class PRFAcc(Callback):
+    def __init__(self, batch_size=128, validation_data=None, verbose=1):
+        assert validation_data is not None
+        super(PRFAcc, self).__init__()
+        self.batch_size = batch_size
+        self.validation_data = validation_data
+        self.verbose = verbose
+
+    def on_epoch_end(self, epoch, logs=None):
+        assert logs is None
+        y_pred = self.model.predict(self.validation_data[0], batch_size=self.batch_size, verbose=self.verbose)
+        y_true = self.validation_data[1][0]
+
+        group_prf, group_f = categorical_prf(y_true, y_pred)
+
+
 
 
 

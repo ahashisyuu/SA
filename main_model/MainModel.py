@@ -10,30 +10,44 @@ class MainModel:
 
     def train(self):
         embedding_matrix = load_embedding_matrix(self.config.matrix_path)
+        char_embedding_matrix = load_embedding_matrix(self.config.char_matrix_path)
         trainingset, validationset, _ = load_data(self.config.data_path)
+
         model = self.cls(embedding_matrix=embedding_matrix,
+                         char_embedding_matrix=char_embedding_matrix,
                          max_len=self.config.max_len,
+                         max_char_len=self.config.max_char_len,
                          category_num=self.config.category_num,
                          dropout=self.config.dropout,
                          optimizer=self.config.optimizer,
                          loss=self.config.loss,
-                         metrics=self.config.metrics)
+                         metrics=self.config.metrics,
+                         need_char_level=self.config.need_char_level,
+                         need_summary=self.config.need_summary)
+
         model.train_model(trainingset[0], trainingset[1],
                           batch_size=self.config.batch_size,
-                          epochs=self.config.epoch,
+                          epochs=self.config.epochs,
                           verbose=self.config.verbose,
-                          validation_data=validationset)
+                          validation_data=validationset,
+                          load_model_name=self.config.last_model)
 
     def predict(self, load_best_model=True, model_path=None):
         embedding_matrix = load_embedding_matrix(self.config.matrix_path)
+        char_embedding_matrix = load_embedding_matrix(self.config.char_matrix_path)
         _, _, testa = load_data(self.config.data_path)
+
         model = self.cls(embedding_matrix=embedding_matrix,
+                         char_embedding_matrix=char_embedding_matrix,
                          max_len=self.config.max_len,
+                         max_char_len=self.config.max_char_len,
                          category_num=self.config.category_num,
                          dropout=self.config.dropout,
                          optimizer=self.config.optimizer,
                          loss=self.config.loss,
-                         metrics=self.config.metrics)
+                         metrics=self.config.metrics,
+                         need_char_level=self.config.need_char_level,
+                         need_summary=self.config.need_summary)
 
         if model_path is not None:
             model.load_weights(model_path)
