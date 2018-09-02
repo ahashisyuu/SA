@@ -12,7 +12,7 @@
 
 ### 关于模型文件
 继承**models**文件夹内的**ExampleModel**类，重写**build_model**函数即可；  
-该类文件应当像如下导入（**models**文件夹内的**FirstModel**有完整导入格式，可参考）：  
+该类文件应有如下导入（**models**文件夹内的**FirstModel**有完整导入格式，可参考）：  
 
     from models.ExampleModel import ExampleModel
     from keras.layers import *

@@ -19,7 +19,7 @@ def parse_args():
     parser = argparse.ArgumentParser('Fine-grained Sentimental Analysis')
     parser.add_argument("--mode", default='train',
                         choices=['train', 'prepare', 'predict', 'evaluate'])
-    parser.add_argument("--model", type=str, help='class name of model')
+    parser.add_argument("--model", type=str, default='FirstModel', help='class name of model')
     parser.add_argument('--load_best_model', action='store_true')
 
     # 路径相关
@@ -35,7 +35,7 @@ def parse_args():
     parser.add_argument('--lr', type=float, default=config.lr)
     parser.add_argument('--dropout', type=float, default=config.dropout)
     parser.add_argument('--optimizer', type=str, default=config.optimizer)
-    parser.add_argument('--loss', type=float, default=config.loss)
+    parser.add_argument('--loss', type=str, default=config.loss)
     parser.add_argument('--metrics', type=list, default=config.metrics)
     parser.add_argument('--monitor', type=str, default=config.monitor)
 
