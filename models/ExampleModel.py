@@ -11,7 +11,7 @@ class ExampleModel:
     def __init__(self, embedding_matrix, char_embedding_matrix, max_len, max_char_len, category_num=4,
                  dropout=0.2, optimizer='RMSprop',
                  loss='categorical_crossentropy', metrics=None,
-                 need_char_level=False, need_summary=False,
+                 need_char_level=False, need_summary=False, vector_trainable=False,
                  **kwargs):
         self.embedding_matrix = embedding_matrix            # 词嵌入矩阵
         self.char_embedding_matrix = char_embedding_matrix  # 字嵌入矩阵
@@ -24,6 +24,7 @@ class ExampleModel:
         self.metrics = metrics                              # 评价方法，必需是列表
         self.need_char_level = need_char_level              # 是否需要中文字级
         self.need_summary = need_summary                    # 是否需要summary
+        self.trainable = vector_trainable                   # 词向量是否可训练
 
         # =====  一些必要的层初始化  =====
         self.document = None
@@ -50,12 +51,14 @@ class ExampleModel:
         self.embedded_doc = Embedding(input_dim=self.embedding_matrix.shape[0],
                                       output_dim=self.embedding_matrix.shape[1],
                                       mask_zero=True,
-                                      weights=self.embedding_matrix)
+                                      weights=self.embedding_matrix,
+                                      trainable=self.trainable)
         if self.need_char_level:
             self.embedded_doc_char = Embedding(input_dim=self.char_embedding_matrix.shape[0],
                                                output_dim=self.char_embedding_matrix.shape[1],
                                                mask_zero=True,
-                                               weights=self.embedding_matrix)
+                                               weights=self.embedding_matrix,
+                                               trainable=self.trainable)
             self.processed_char = self.process_char(self.embedded_doc_char)
             self.doc = concatenate([self.embedded_doc, self.processed_char], axis=-1)
         else:

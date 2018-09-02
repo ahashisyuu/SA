@@ -41,6 +41,7 @@ def parse_args():
 
     parser.add_argument('--need_char_level', type=bool, default=config.need_char_level)
     parser.add_argument('--need_summary', type=bool, default=config.need_summary)
+    parser.add_argument('--vector_trainable', type=bool, default=config.vector_trainable)
 
     parser.add_argument('--batch_size', type=int, default=config.batch_size)
     parser.add_argument('--epochs', type=int, default=config.epochs)

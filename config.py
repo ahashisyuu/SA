@@ -18,6 +18,7 @@ class Config:
 
     need_char_level = False                                # 是否启用字级向量
     need_summary = False                                   # 是否打印summary信息
+    vector_trainable = False                               # 词向量是否可训练
 
     batch_size = 64
     epochs = 50

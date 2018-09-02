@@ -43,7 +43,8 @@ class MainModel:
                          loss=self.config.loss,
                          metrics=self.config.metrics,
                          need_char_level=self.config.need_char_level,
-                         need_summary=self.config.need_summary)
+                         need_summary=self.config.need_summary,
+                         vector_trainable=self.config.vector_trainable)
 
         validationset = [validationset[0], validationset[1][self.arrangement_index]]
         model.train_model(trainingset[0], trainingset[1][self.arrangement_index],
@@ -71,7 +72,8 @@ class MainModel:
                          loss=self.config.loss,
                          metrics=self.config.metrics,
                          need_char_level=self.config.need_char_level,
-                         need_summary=self.config.need_summary)
+                         need_summary=self.config.need_summary,
+                         vector_trainable=self.config.vector_trainable)
 
         if self.config.model_name is not None:
             model.load_weights(self.config.model_name)
