@@ -1,8 +1,7 @@
 import os
-
-from keras.callbacks import ModelCheckpoint, TensorBoard, LearningRateScheduler
+import keras.backend as K
+from keras.callbacks import TensorBoard, LearningRateScheduler
 from utils import ModelForLoss as Model
-from keras import backend as K
 from keras.layers import Input, Dense, GRU, Reshape, Embedding, concatenate
 
 from utils import learning_rate, PRFAcc
@@ -18,7 +17,7 @@ class ExampleModel:
         self.char_embedding_matrix = char_embedding_matrix  # 字嵌入矩阵
         self.max_len = max_len                              # 最大文档长度
         self.max_char_len = max_char_len                    # 词最多包含多少字
-        self.category_num = category_num                    # 总的类别数量
+        self.class_num = category_num                    # 总的类别数量
         self.dropout = dropout
         self.optimizer = optimizer
         self.loss = loss
@@ -77,13 +76,16 @@ class ExampleModel:
         """
             模型运算主体
             输入：doc: 词向量序列，形状为(Batch_size, max_len, dimensions)
-            输出：output: 类别预测，为经过softmax运算得到的概率值，形状为(Batch_size, category_num)
+            输出：output: 类别预测，为经过softmax运算得到的概率值，形状为(Batch_size, class_num)
 
         """
         # return output
         raise NotImplementedError
 
     def complie_model(self):
+        output_shape = K.int_shape(self.output)
+        assert len(output_shape) == 2 and output_shape[1] == self.class_num, \
+            'output的形状必需是（B, class_num），但得到的是：（{0}， {1}）'.format(*output_shape)
         if self.need_char_level:
             self.model = Model(inputs=[self.document, self.doc_char], outputs=[self.output])
         else:

@@ -1,5 +1,6 @@
 import os
 import tensorflow as tf
+from keras import optimizers
 from keras.backend import tensorflow_backend as KTF
 from evaluate import categorical_prf
 from utils import load_embedding_matrix, load_data
@@ -19,6 +20,10 @@ class MainModel:
         self.cls = cls
         self.config = config
         self.arrangement_index = load_data(self.config.map_path).get(self.config.arrangement, 0)
+
+        # 初始化优化器
+        identifier = {'class_name': self.config.optimizer, 'config': {'lr': self.config.lr}}
+        self.config.optimizer = optimizers.get(identifier)
 
     def train(self):
         embedding_matrix = load_embedding_matrix(self.config.matrix_path)
