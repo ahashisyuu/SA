@@ -1,7 +1,9 @@
 # SA
 ## 1.框架结构
 ### 关于数据
-（1）**rawData**文件夹存的是官网下的原生语料；  
+（1）**rawData**文件夹存的是官网下的原生语料, 包含文件如下；  
+        ![rawData](img/rawData.bmp)
+
 （2）**data**文件夹是已经处理好的数据文件；  
 （3）**preprocessing**文件夹包含数据预处理的一些文件；  
 （3）要得到处理好的数据可以直接运行**preprocessing**文件夹内的preprocessing.py文件,或者在当前命令行执行以下指令：  
