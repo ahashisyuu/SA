@@ -56,6 +56,8 @@ def run(args):
         preprocessing(args)
     else:
         cls = main_model.get(args.model)
+        if cls is None:
+            return
         model = MainModel(cls=cls, config=args)
 
         if args.mode == 'train':
