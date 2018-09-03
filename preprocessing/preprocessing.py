@@ -55,9 +55,9 @@ def tokenizor():
     validationset['content'] = validationset['content'].apply(tokenize)
     testa['content'] = testa['content'].apply(tokenize)
 
-    trainingset.to_csv(os.path.join(new_path, 'trainingset.csv'))
-    validationset.to_csv(os.path.join(new_path, 'validationset.csv'))
-    testa.to_csv(os.path.join(new_path, 'testa.csv'))
+    # trainingset.to_csv(os.path.join(new_path, 'trainingset.csv'))
+    # validationset.to_csv(os.path.join(new_path, 'validationset.csv'))
+    # testa.to_csv(os.path.join(new_path, 'testa.csv'))
     return trainingset, validationset, testa
 
 
@@ -69,6 +69,10 @@ def preprocessing(args):
         为了方便分类器选择，要生成一个如{‘层次名’: 序号}的字典，方便训练
 
     """
+    trainingset, validationset, testa = tokenizor()   # pandas
+    count_dic = {}
+    trainingset['content'] = trainingset['content'].apply(word_count, args=(count_dic,))
+    validationset['content'] = validationset['content'].apply(word_count,args=(count_dic,))
 
 
     return None
