@@ -20,8 +20,12 @@ def load_data(filepath):
     return data
 
 
-def save_results(results):
-    pd.DataFrame(results)
+def save_results(results, args):
+    old_path = '../rawData'
+    filename = os.path.join(old_path, 'sentiment_analysis_testa.csv')
+    testa = pd.read_csv(filename)
+    testa[args.arrangement] = results.argmax(axis=-1) - 3
+    testa.to_csv(filename)
 
 
 def check_models(path):

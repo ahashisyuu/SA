@@ -64,7 +64,7 @@ def run(args):
             model.train()
         elif args.mode == 'predict':
             results = model.predict(load_best_model=args.load_best_model)
-            save_results(results)
+            save_results(results, args)
         else:
             model.evaluate(load_best_model=args.load_best_model)
 

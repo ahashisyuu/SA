@@ -15,7 +15,6 @@ def load_rawData(data_path):
             validationset = pd.read_csv(os.path.join(data_path, name))
         if 'testa.csv' in name:
             testa = pd.read_csv(os.path.join(data_path, name))
-            testa.to_csv()
     return trainingset, validationset, testa
 
 
@@ -72,8 +71,7 @@ def preprocessing(args):
     trainingset, validationset, testa = tokenizor()   # pandas
     count_dic = {}
     trainingset['content'] = trainingset['content'].apply(word_count, args=(count_dic,))
-    validationset['content'] = validationset['content'].apply(word_count,args=(count_dic,))
-
+    validationset['content'] = validationset['content'].apply(word_count, args=(count_dic,))
 
     return None
 
