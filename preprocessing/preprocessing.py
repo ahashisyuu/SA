@@ -70,9 +70,10 @@ def preprocessing(args):
 
     """
     trainingset, validationset, testa = tokenizor()   # pandas
-    count_dic = {}
-    trainingset['content'] = trainingset['content'].apply(word_count, args=(count_dic,))
-    validationset['content'] = validationset['content'].apply(word_count,args=(count_dic,))
+    print(trainingset.shape)
+    # count_dic = {}
+    # trainingset['content'] = trainingset['content'].apply(word_count, args=(count_dic,))
+    # validationset['content'] = validationset['content'].apply(word_count,args=(count_dic,))
 
 
     return None
