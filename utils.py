@@ -25,7 +25,7 @@ def save_results(results, args):
     filename = os.path.join(old_path, 'sentiment_analysis_testa.csv')
     testa = pd.read_csv(filename)
     testa[args.arrangement] = results.argmax(axis=-1) - 3
-    testa.to_csv(filename)
+    testa.to_csv(filename, index=False)
 
 
 def check_models(path):

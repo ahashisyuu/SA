@@ -54,9 +54,9 @@ def tokenizor():
     validationset['content'] = validationset['content'].apply(tokenize)
     testa['content'] = testa['content'].apply(tokenize)
 
-    # trainingset.to_csv(os.path.join(new_path, 'trainingset.csv'))
-    # validationset.to_csv(os.path.join(new_path, 'validationset.csv'))
-    # testa.to_csv(os.path.join(new_path, 'testa.csv'))
+    # trainingset.to_csv(os.path.join(new_path, 'trainingset.csv'), index=False)
+    # validationset.to_csv(os.path.join(new_path, 'validationset.csv'), index=False)
+    # testa.to_csv(os.path.join(new_path, 'testa.csv'), index=False)
     return trainingset, validationset, testa
 
 
@@ -69,6 +69,10 @@ def preprocessing(args):
 
     """
     trainingset, validationset, testa = tokenizor()   # pandas
+
+    keys_list = trainingset.keys().tolist()[2:]
+    keys_dic
+
     count_dic = {}
     trainingset['content'] = trainingset['content'].apply(word_count, args=(count_dic,))
     validationset['content'] = validationset['content'].apply(word_count, args=(count_dic,))
