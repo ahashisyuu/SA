@@ -146,7 +146,7 @@ def preprocessing(args):
                           make_output_list(validationset.iloc[:, 2:], arrangement_map)]
     testa_data = [make_input_list(testa['content'], max_len=args.max_len), []]
 
-    with open(os.path.join('../data', 'dataset.pkl')) as fw:
+    with open(os.path.join('../data', 'dataset.pkl'), 'wb') as fw:
         pkl.dump([trainingset_data, validationset_data, testa_data], fw)
 
     return None
