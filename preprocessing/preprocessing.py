@@ -2,8 +2,10 @@ import jieba
 import pickle as pkl
 import pandas as pd
 import os
+import numpy as np
+from keras.preprocessing.sequence import pad_sequences
 
-from preprocessing.word_count import word_count, get_vec_dic, process_dic
+from preprocessing.word_count import word_count, get_vec_dic, process_dic, ConvertToENG
 
 
 def load_rawData(data_path):
@@ -63,6 +65,28 @@ def tokenizor():
     return trainingset, validationset, testa
 
 
+def make_input_list(data_frame, max_len=314):
+    """
+
+    :param data_frame: 为pandas的Series对象
+    :return: numpy对象列表
+    """
+    input_list = [text for text in data_frame.values]
+    input_list = pad_sequences(input_list, maxlen=max_len, padding='post', truncating='post')
+    return [input_list]
+
+
+def make_output(data_frame):
+    return np.asarray([label for label in data_frame.values])
+
+
+def make_output_list(data_frame, arrangement_map):
+    output_list = []
+    for key, value in arrangement_map.items():
+        output_list.append(make_output(data_frame[key]))
+    return output_list
+
+
 def preprocessing(args):
     """
         整合成如下纯列表形式：[input_list, output_list],
@@ -73,26 +97,57 @@ def preprocessing(args):
     """
     trainingset, validationset, testa = tokenizor()   # pandas
 
+    # get arrangement_map
     keys_list = trainingset.keys().tolist()[2:]
     arrangement_map = {key: i for i, key in enumerate(keys_list)}
     map_name = os.path.join('../data', 'arrangement_map.pkl')
-    with open(map_name, 'wb') as fw:
+    keys_list_name = os.path.join('../data', 'keys_list.txt')
+    with open(map_name, 'wb') as fw, open(keys_list_name, 'w') as fw2:
         pkl.dump(arrangement_map, fw)
+
+        for key in keys_list:
+            fw2.write(key + '\n')
 
     count_dic = {}
     trainingset['content'].apply(word_count, args=(count_dic,))
     validationset['content'].apply(word_count, args=(count_dic,))
 
+    # get vector dict
     word_vector_name = os.path.join('../rawData', 'sgns.merge.word')
-    with open(word_vector_name, 'r') as fr:
+    with open(word_vector_name, 'r', encoding='utf-8') as fr:
         vec_dic = get_vec_dic(fr)
 
-    word2index = process_dic(dic_count=count_dic, vec_dic=vec_dic)
+    # get word2index
+    word2index, drop_word = process_dic(dic_count=count_dic, vec_dic=vec_dic)
     word2index_name = os.path.join('../data', 'word2index.pkl')
     with open(word2index_name, 'wb') as fw:
-        pkl.dump(word2index, fw)
+        pkl.dump([word2index, drop_word], fw)
 
+    # get embedding matrix
+    embedding_matrix = np.random.randn(len(word2index), 300)
+    for key, index in word2index.items():
+        if key == '<unk>':
+            continue
+        embedding_matrix[index] = vec_dic[key]
+    embedding_matrix[0] = np.zeros((300,))
 
+    embedding_matrix_name = os.path.join('../data', 'embedding_matrix.pkl')
+    with open(embedding_matrix_name, 'wb') as fw:
+        pkl.dump(embedding_matrix, fw)
+
+    # replace data
+    trainingset['content'] = trainingset['content'].apply(ConvertToENG, args=(word2index, drop_word))
+    validationset['content'] = validationset['content'].apply(ConvertToENG, args=(word2index, drop_word))
+    testa['content'] = testa['content'].apply(ConvertToENG, args=(word2index, drop_word))
+
+    trainingset_data = [make_input_list(trainingset['content'], max_len=args.max_len),
+                        make_output_list(trainingset.iloc[:, 2:], arrangement_map)]
+    validationset_data = [make_input_list(validationset['content'], max_len=args.max_len),
+                          make_output_list(validationset.iloc[:, 2:], arrangement_map)]
+    testa_data = [make_input_list(testa['content'], max_len=args.max_len), []]
+
+    with open(os.path.join('../data', 'dataset.pkl')) as fw:
+        pkl.dump([trainingset_data, validationset_data, testa_data], fw)
 
     return None
 

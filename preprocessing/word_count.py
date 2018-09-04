@@ -1,5 +1,5 @@
-# 初始化unknown字符序号
-unknown_num = 0
+import numpy as np
+
 
 def word_count(doc_list, dic_count):
     # 计算词频
@@ -13,6 +13,7 @@ def word_count(doc_list, dic_count):
 
     return dic_count
 
+
 def get_vec_dic(vec_list):
     # 获得词向量字典
     vec_dic = {}
@@ -21,44 +22,44 @@ def get_vec_dic(vec_list):
         if count == 1:
             count += 1
             continue
-        vec_dic[line[0]] = line[1:]
+        values = line.split()
+        vec_dic[values[0]] = np.asarray(values[1:], dtype='float32')
     return vec_dic
 
-def process_dic(dic_count, vec_dic):
+
+def process_dic(dic_count, vec_dic, max_cnt=1500000, min_cnt=0):
     # 按照词频从高到低排列，并表示unknown字符
-    count_list = sorted(dic_count.iteritems(), key=lambda x:x[1], reverse=True)[:-2]
+    count_list = sorted(dic_count.items(), key=lambda x: x[1], reverse=True)
     count_dic_sorted = {}
+    split_word = []
     for line in count_list:
+        if line[1] >= max_cnt or line[1] <= min_cnt:
+            split_word.append(line[0])
+            continue
         count_dic_sorted[line[0]] = line[1]
-
-
-    # sort_num = 1
-
-    # for key, value in count_dic_sorted.items():
-    #     if value != 1 and value != 2:
-    #         count_dic_sorted[key] = sort_num
-    #         sort_num += 1
-    # unknown_num = sort_num + 1
 
     new_dic = {}
     sort_num = 1
     for key, value in count_dic_sorted.items():
-        if vec_dic.has_key(key):
+        if key in vec_dic:
             new_dic[key] = sort_num
             sort_num += 1
     new_dic['<unk>'] = sort_num
-    return new_dic
 
-def ConvertToENG(doc_list, count_dic_sorted):
+    return new_dic, split_word
+
+
+def ConvertToENG(doc_list, count_dic_sorted, drop_word):
     # 将文章中的单词转为字典序，返回列表
     doc_num_list = []
-
+    unknown_num = len(count_dic_sorted)
     for word in doc_list:
-        if count_dic_sorted.has_key(word):
+        if word in count_dic_sorted:
             doc_num_list.append(count_dic_sorted.get(word))
+        elif word in drop_word:
+            continue
         else:
             doc_num_list.append(unknown_num)
-    doc_num_list.append("\n")
 
     return doc_num_list
 

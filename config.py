@@ -6,7 +6,7 @@ class Config:
     map_path = './data/arrangement_map.pkl'                # 层次名字典，保存相应的序号
 
     arrangement = 'location_traffic_ convenience'          # 层次名
-    max_len = 200                                          # 文本最大长度
+    max_len = 314                                          # 文本最大长度
     max_char_len = 5                                       # 词的最大字数
     category_num = 4                                       # 单个层次的类别数
     lr = 0.001
