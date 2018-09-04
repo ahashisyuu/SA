@@ -16,29 +16,38 @@ def word_count(doc_list, dic_count):
 def get_vec_dic(vec_list):
     # 获得词向量字典
     vec_dic = {}
+    count = 1
     for line in vec_list:
+        if count == 1:
+            count += 1
+            continue
         vec_dic[line[0]] = line[1:]
     return vec_dic
 
 def process_dic(dic_count, vec_dic):
     # 按照词频从高到低排列，并表示unknown字符
-    count_list = sorted(dic_count.iteritems(), key=lambda x:x[1], reverse=True)
+    count_list = sorted(dic_count.iteritems(), key=lambda x:x[1], reverse=True)[:-2]
     count_dic_sorted = {}
     for line in count_list:
         count_dic_sorted[line[0]] = line[1]
-    sort_num = 0
 
+
+    # sort_num = 1
+
+    # for key, value in count_dic_sorted.items():
+    #     if value != 1 and value != 2:
+    #         count_dic_sorted[key] = sort_num
+    #         sort_num += 1
+    # unknown_num = sort_num + 1
+
+    new_dic = {}
+    sort_num = 1
     for key, value in count_dic_sorted.items():
-        if value != 1 and value != 2:
-            count_dic_sorted[key] = sort_num
+        if vec_dic.has_key(key):
+            new_dic[key] = sort_num
             sort_num += 1
-    unknown_num = sort_num + 1
-
-    for key, value in count_dic_sorted.items():
-        if value == 1 or value == 2 or vec_dic.has_key(key) == False:
-            count_dic_sorted[key] = unknown_num
-
-    return count_dic_sorted
+    new_dic['<unk>'] = sort_num
+    return new_dic
 
 def ConvertToENG(doc_list, count_dic_sorted):
     # 将文章中的单词转为字典序，返回列表

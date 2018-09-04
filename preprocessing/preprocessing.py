@@ -1,6 +1,9 @@
 import jieba
+import pickle as pkl
 import pandas as pd
 import os
+
+from preprocessing.word_count import word_count, get_vec_dic, process_dic
 
 
 def load_rawData(data_path):
@@ -71,11 +74,25 @@ def preprocessing(args):
     trainingset, validationset, testa = tokenizor()   # pandas
 
     keys_list = trainingset.keys().tolist()[2:]
-    keys_dic
+    arrangement_map = {key: i for i, key in enumerate(keys_list)}
+    map_name = os.path.join('../data', 'arrangement_map.pkl')
+    with open(map_name, 'wb') as fw:
+        pkl.dump(arrangement_map, fw)
 
     count_dic = {}
-    trainingset['content'] = trainingset['content'].apply(word_count, args=(count_dic,))
-    validationset['content'] = validationset['content'].apply(word_count, args=(count_dic,))
+    trainingset['content'].apply(word_count, args=(count_dic,))
+    validationset['content'].apply(word_count, args=(count_dic,))
+
+    word_vector_name = os.path.join('../rawData', 'sgns.merge.word')
+    with open(word_vector_name, 'r') as fr:
+        vec_dic = get_vec_dic(fr)
+
+    word2index = process_dic(dic_count=count_dic, vec_dic=vec_dic)
+    word2index_name = os.path.join('../data', 'word2index.pkl')
+    with open(word2index_name, 'wb') as fw:
+        pkl.dump(word2index, fw)
+
+
 
     return None
 
