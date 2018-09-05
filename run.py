@@ -16,7 +16,7 @@ check_layers('./layers')
 
 
 def parse_args():
-    parser = argparse.ArgumentParser('Fine-grained Sentimental Analysis')
+    parser = argparse.ArgumentParser()
     parser.add_argument("--mode", default='train',
                         choices=['train', 'prepare', 'predict', 'evaluate'])
     parser.add_argument("--model", type=str, default='FirstModel', help='class name of model')
