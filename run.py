@@ -44,6 +44,7 @@ def parse_args():
     parser.add_argument('--vector_trainable', type=bool, default=config.vector_trainable)
 
     parser.add_argument('--batch_size', type=int, default=config.batch_size)
+    parser.add_argument('--valid_batch_size', type=int, default=config.valid_batch_size)
     parser.add_argument('--epochs', type=int, default=config.epochs)
     parser.add_argument('--verbose', type=int, default=config.verbose)
     parser.add_argument('--model_name', type=str, default=config.model_name)
@@ -59,7 +60,9 @@ def run(args):
         if cls is None:
             return
         model = MainModel(cls=cls, config=args)
-
+        print('--------------------------------------------------------------')
+        print('        本次对应的层次为: %s' % args.arrangement)
+        print('--------------------------------------------------------------')
         if args.mode == 'train':
             model.train()
         elif args.mode == 'predict':

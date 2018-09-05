@@ -20,7 +20,8 @@ class Config:
     need_summary = False                                   # 是否打印summary信息
     vector_trainable = False                               # 词向量是否可训练
 
-    batch_size = 64
+    batch_size = 512
+    valid_batch_size = 1024
     epochs = 50
     verbose = 1
     model_name = None                                      # 用于预测，评估或者训练的模型名称

@@ -40,6 +40,7 @@ class MainModel:
                          category_num=self.config.category_num,
                          dropout=self.config.dropout,
                          optimizer=self.config.optimizer,
+                         arrangement_index=self.arrangement_index,
                          loss=self.config.loss,
                          metrics=self.config.metrics,
                          need_char_level=self.config.need_char_level,
@@ -48,6 +49,7 @@ class MainModel:
 
         validationset = [validationset[0], validationset[1][self.arrangement_index]]
         model.train_model(trainingset[0], trainingset[1][self.arrangement_index],
+                          arrangement=self.config.arrangement,
                           batch_size=self.config.batch_size,
                           valid_batch_size=self.config.valid_batch_size,
                           epochs=self.config.epochs,
@@ -69,6 +71,7 @@ class MainModel:
                          category_num=self.config.category_num,
                          dropout=self.config.dropout,
                          optimizer=self.config.optimizer,
+                         arrangement_index=self.arrangement_index,
                          loss=self.config.loss,
                          metrics=self.config.metrics,
                          need_char_level=self.config.need_char_level,
@@ -78,7 +81,7 @@ class MainModel:
         if self.config.model_name is not None:
             model.load_weights(self.config.model_name)
         elif load_best_model is True:
-            path = '../models/save_model_' + model.name
+            path = './models/save_model_' + model.name
             final_name = find_best_model(path, monitor=self.config.monitor)
             print('模型全名为：%s' % final_name)
             model_path = os.path.join(path, final_name)

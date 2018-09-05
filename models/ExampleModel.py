@@ -1,7 +1,7 @@
 import os
 import keras.backend as K
 from keras.callbacks import TensorBoard, LearningRateScheduler
-from utils import ModelForLoss as Model
+from keras.engine import Model
 from keras.layers import Input, Dense, GRU, Reshape, Embedding, concatenate
 
 from utils import learning_rate, PRFAcc
@@ -9,7 +9,7 @@ from utils import learning_rate, PRFAcc
 
 class ExampleModel:
     def __init__(self, embedding_matrix, char_embedding_matrix, max_len, max_char_len, category_num=4,
-                 dropout=0.2, optimizer='RMSprop',
+                 dropout=0.2, optimizer='RMSprop', arrangement_index=0,
                  loss='categorical_crossentropy', metrics=None,
                  need_char_level=False, need_summary=False, vector_trainable=False,
                  **kwargs):
@@ -20,6 +20,7 @@ class ExampleModel:
         self.class_num = category_num                    # 总的类别数量
         self.dropout = dropout
         self.optimizer = optimizer
+        self.arrangement_index = arrangement_index
         self.loss = loss
         self.metrics = metrics                              # 评价方法，必需是列表
         self.need_char_level = need_char_level              # 是否需要中文字级
@@ -51,14 +52,14 @@ class ExampleModel:
         self.embedded_doc = Embedding(input_dim=self.embedding_matrix.shape[0],
                                       output_dim=self.embedding_matrix.shape[1],
                                       mask_zero=True,
-                                      weights=self.embedding_matrix,
-                                      trainable=self.trainable)
+                                      weights=[self.embedding_matrix],
+                                      trainable=self.trainable)(self.document)
         if self.need_char_level:
             self.embedded_doc_char = Embedding(input_dim=self.char_embedding_matrix.shape[0],
                                                output_dim=self.char_embedding_matrix.shape[1],
                                                mask_zero=True,
-                                               weights=self.embedding_matrix,
-                                               trainable=self.trainable)
+                                               weights=[self.embedding_matrix],
+                                               trainable=self.trainable)(self.doc_char)
             self.processed_char = self.process_char(self.embedded_doc_char)
             self.doc = concatenate([self.embedded_doc, self.processed_char], axis=-1)
         else:
@@ -90,7 +91,8 @@ class ExampleModel:
         assert len(output_shape) == 2 and output_shape[1] == self.class_num, \
             'output的形状必需是（B, class_num），但得到的是：（{0}， {1}）'.format(*output_shape)
         if self.need_char_level:
-            self.model = Model(inputs=[self.document, self.doc_char], outputs=[self.output])
+            self.model = Model(inputs=[self.document, self.doc_char],
+                               outputs=[self.output])
         else:
             self.model = Model(inputs=[self.document], outputs=[self.output])
         self.model.compile(optimizer=self.optimizer, loss=self.loss,
@@ -103,21 +105,22 @@ class ExampleModel:
                     batch_size=64, valid_batch_size=128, epochs=30, verbose=1,
                     validation_data=None, callbacks=None, monitor='val_loss',
                     load_model_name=None):
-        if os.path.exists('./save_model_' + self.model.name) is False:
-            os.mkdir('./save_model_' + self.model.name)
+        if os.path.exists('./models/save_model_' + self.__class__.__name__) is False:
+            os.mkdir('./models/save_model_' + self.__class__.__name__)
 
         if load_model_name is not None:
-            filepath = os.path.join('./save_model_' + self.model.name, load_model_name)
+            filepath = os.path.join('./models/save_model_' + self.__class__.__name__, load_model_name)
             self.model.load_weight(filepath)
 
         if callbacks is None:
-            save_path = './save_model_' + self.model.name + arrangement \
+            save_path = './models/save_model_' + self.__class__.__name__ + arrangement \
                         + '/epoch{epoch}_loss{loss:.4f}_valloss{val_loss:.4f}' \
                           '_fmeasure{fmeasure:.4f}_valacc{val_acc:.4f}.model'
             callbacks = [TensorBoard(write_graph=True, histogram_freq=0),
                          LearningRateScheduler(schedule=learning_rate),
                          PRFAcc(filepath=save_path, monitor=monitor,
                                 batch_size=valid_batch_size,
+                                arrangement_index=self.arrangement_index,
                                 validation_data=validation_data)]
 
         self.model.fit(train_data, train_label,
@@ -131,11 +134,11 @@ class ExampleModel:
         return self.model.predict(test_data, batch_size=pre_batch_size, verbose=verbose)
 
     def load_weights(self, filepath):
-        self.model.load_weight(filepath)
+        self.model.load_weight(os.path.join('./models/save_model_', filepath))
 
     @property
     def name(self):
-        return self.model.name
+        return self.__class__.__name__
 
 
 

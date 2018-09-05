@@ -1,6 +1,10 @@
 import numpy as np
 
 
+def compute_loss(y_true, y_pred):
+    return np.mean(np.sum(y_true * np.log(y_pred), axis=-1))
+
+
 def binary_prf(y_true, y_pred):
     """
         y_true:真实标签的ndarray，形状为(N,), N为所有样本的个数

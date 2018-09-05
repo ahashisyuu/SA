@@ -5,7 +5,7 @@ import sys
 import pandas as pd
 from keras import Model
 from keras.callbacks import ModelCheckpoint
-from evaluate import categorical_prf
+from evaluate import categorical_prf, compute_loss
 
 
 def load_embedding_matrix(filepath):
@@ -36,7 +36,8 @@ def check_models(path):
     list_dir = os.listdir(path)
     with open(os.path.join(path, '__init__.py'), 'a') as fa:
         for name in list_dir:
-            if '__' not in name and 'Example' not in name:
+            if '__' not in name and 'Example' not in name \
+                    and os.path.isdir(os.path.join(path, name)) is False:
                 tag = False
                 line = 'from models.' + name[:-3] + ' import *'
 
@@ -58,7 +59,7 @@ def check_layers(path):
     list_dir = os.listdir(path)
     with open(os.path.join(path, '__init__.py'), 'a') as fa:
         for name in list_dir:
-            if '__' not in name:
+            if '__' not in name and os.path.isdir(os.path.join(path, name)) is False:
                 tag = False
                 line = 'from layers.' + name[:-3] + ' import *'
 
@@ -77,28 +78,30 @@ def learning_rate(epoch, lr):
 
 
 class PRFAcc(ModelCheckpoint):
-    def __init__(self, filepath, monitor="val_loss", batch_size=128, validation_data=None, **kwargs):
+    def __init__(self, filepath, monitor="val_loss", batch_size=128, validation_data=None, arrangement_index=0, **kwargs):
         assert validation_data is not None
         super(PRFAcc, self).__init__(filepath, monitor=monitor, **kwargs)
         self.batch_size = batch_size
-        self.validation_data = validation_data
+        self.validationset = validation_data
         self.verbose = None
         self.epochs = None
+        self.arrangement_index = arrangement_index
 
     def on_train_begin(self, logs=None):
         self.verbose = self.params['verbose']
         self.epochs = self.params['epochs']
 
     def on_epoch_end(self, epoch, logs=None):
-        assert logs is None
+        y_pred = self.model.predict(self.validationset[0], batch_size=self.batch_size, verbose=self.verbose)
 
-        self.model.predict_loss = True
-        y_pred, val_loss = self.model.predict(self.validation_data[0], batch_size=self.batch_size, verbose=self.verbose)
-        y_true = self.validation_data[1][0]
+        y_true = self.validationset[1][self.arrangement_index]
+        val_loss = compute_loss(y_true, y_pred)
 
         group_prf, group_f, acc = categorical_prf(y_true, y_pred)
 
-        info = '\nEPOCH {0} 的PRF值：\n'.format(epoch)
+        info = '\nEPOCH {0} 的val_loss：{1:.4f}'.format(epoch, val_loss)
+        sys.stdout.write(info)
+        info = 'EPOCH {0} 的PRF值：\n'.format(epoch)
         sys.stdout.write(info)
         for i, prf in enumerate(group_prf):
             info = '{0}: ({1:.4f>8}, {2:.4f>8}, {3:.4f>8})\n'.format(i, *prf)
@@ -111,15 +114,6 @@ class PRFAcc(ModelCheckpoint):
         super(PRFAcc, self).on_epoch_end(epoch, logs)
 
 
-class ModelForLoss(Model):
-    def __init__(self, *args, predict_loss=False, **kwargs):
-        super(ModelForLoss, self).__init__(*args, **kwargs)
-        self.predict_loss = predict_loss
-
-    def _make_predict_function(self):
-        if self.predict_loss:
-            self.outputs.append(self.total_loss)
-        super(ModelForLoss, self)._make_predict_function()
 
 
 
