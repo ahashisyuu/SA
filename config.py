@@ -14,7 +14,7 @@ class Config:
     optimizer = 'RMSprop'
     loss = 'categorical_crossentropy'
     metrics = ['acc']
-    monitor = 'val_loss'
+    monitor = 'fmeasure'
 
     need_char_level = False                                # 是否启用字级向量
     need_summary = False                                   # 是否打印summary信息

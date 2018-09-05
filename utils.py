@@ -74,22 +74,26 @@ def check_layers(path):
 
 
 def learning_rate(epoch, lr):
+
     return lr
 
 
 class PRFAcc(ModelCheckpoint):
-    def __init__(self, filepath, monitor="val_loss", batch_size=128, validation_data=None, arrangement_index=0, **kwargs):
+    def __init__(self, filepath, path, monitor="val_loss", batch_size=128, validation_data=None, arrangement_index=0, **kwargs):
         assert validation_data is not None
         super(PRFAcc, self).__init__(filepath, monitor=monitor, **kwargs)
         self.batch_size = batch_size
         self.validationset = validation_data
         self.verbose = None
         self.epochs = None
+        self.path = path
+        self.epoch_info_file = None
         self.arrangement_index = arrangement_index
 
     def on_train_begin(self, logs=None):
         self.verbose = self.params['verbose']
         self.epochs = self.params['epochs']
+        self.epoch_info_file = open(os.path.join(self.path, 'info.log'), 'w')
 
     def on_epoch_end(self, epoch, logs=None):
         y_pred = self.model.predict(self.validationset[0], batch_size=self.batch_size, verbose=self.verbose)
@@ -101,19 +105,29 @@ class PRFAcc(ModelCheckpoint):
 
         info = '\nEPOCH {0} 的val_loss：{1:.4f}\n'.format(epoch, val_loss)
         sys.stdout.write(info)
+        self.epoch_info_file.write(info)
+
         info = 'EPOCH {0} 的PRF值：\n'.format(epoch)
         sys.stdout.write(info)
+        self.epoch_info_file.write(info)
+
         for i, prf in enumerate(group_prf):
             info = '{0}: (P: {1:.4f}, R: {2:.4f}, F: {3:.4f})\n'.format(i, *prf)
             sys.stdout.write(info)
+            self.epoch_info_file.write(info)
+
         info = 'total_f1_score: {0:.4f}, acc: {1:.4f}\n'.format(group_f, acc)
         sys.stdout.write(info)
         sys.stdout.flush()
+        self.epoch_info_file.write(info)
+
         logs['val_acc'] = acc
         logs['fmeasure'] = group_f
         logs['val_loss'] = val_loss
         super(PRFAcc, self).on_epoch_end(epoch, logs)
 
+    def on_train_end(self, logs=None):
+        self.epoch_info_file.close()
 
 
 

@@ -1,6 +1,6 @@
 import os
 import keras.backend as K
-from keras.callbacks import TensorBoard, LearningRateScheduler
+from keras.callbacks import TensorBoard, LearningRateScheduler, EarlyStopping
 from keras.engine import Model
 from keras.layers import Input, Dense, GRU, Reshape, Embedding, concatenate
 
@@ -120,12 +120,14 @@ class ExampleModel:
             save_path = path \
                         + '/epoch{epoch}_loss{loss:.4f}_valloss{val_loss:.4f}' \
                           '_fmeasure{fmeasure:.4f}_valacc{val_acc:.4f}.model'
-            callbacks = [TensorBoard(write_graph=True, histogram_freq=0),
+            callbacks = [TensorBoard(log_dir=os.path.join(path, 'logs'),
+                                     write_graph=True, histogram_freq=0),
                          LearningRateScheduler(schedule=learning_rate),
-                         PRFAcc(filepath=save_path, monitor=monitor,
+                         PRFAcc(filepath=save_path, path=path, monitor=monitor,
                                 batch_size=valid_batch_size,
                                 arrangement_index=self.arrangement_index,
-                                validation_data=validation_data)]
+                                validation_data=validation_data),
+                         EarlyStopping(monitor=monitor, min_delta=0.01, patience=5)]
 
         self.model.fit(train_data, train_label,
                        batch_size=batch_size,
