@@ -18,8 +18,8 @@ def binary_prf(y_true, y_pred):
     TP_FN = y_true.sum()
 
     # print(TP, TP_FP, TP_FN)
-    precision = (TP + 1) / (TP_FP + 1)
-    recall = (TP + 1) / (TP_FN + 1)
+    precision = TP / (TP_FP + 1)
+    recall = TP / TP_FN
     f1_score = 2*precision*recall / (precision + recall)
 
     return precision, recall, f1_score
