@@ -103,11 +103,11 @@ class PRFAcc(ModelCheckpoint):
 
         group_prf, group_f, acc = categorical_prf(y_true, y_pred)
 
-        info = '\nEPOCH {0} 的val_loss：{1:.4f}\n'.format(epoch, val_loss)
+        info = '\nEPOCH {0} 的val_loss：{1:.4f}\n'.format(epoch + 1, val_loss)
         sys.stdout.write(info)
         self.epoch_info_file.write(info)
 
-        info = 'EPOCH {0} 的PRF值：\n'.format(epoch)
+        info = 'EPOCH {0} 的PRF值：\n'.format(epoch + 1)
         sys.stdout.write(info)
         self.epoch_info_file.write(info)
 
