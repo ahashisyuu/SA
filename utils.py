@@ -94,23 +94,24 @@ class PRFAcc(ModelCheckpoint):
     def on_epoch_end(self, epoch, logs=None):
         y_pred = self.model.predict(self.validationset[0], batch_size=self.batch_size, verbose=self.verbose)
 
-        y_true = self.validationset[1][self.arrangement_index]
+        y_true = self.validationset[1]
         val_loss = compute_loss(y_true, y_pred)
 
         group_prf, group_f, acc = categorical_prf(y_true, y_pred)
 
-        info = '\nEPOCH {0} 的val_loss：{1:.4f}'.format(epoch, val_loss)
+        info = '\nEPOCH {0} 的val_loss：{1:.4f}\n'.format(epoch, val_loss)
         sys.stdout.write(info)
         info = 'EPOCH {0} 的PRF值：\n'.format(epoch)
         sys.stdout.write(info)
         for i, prf in enumerate(group_prf):
-            info = '{0}: ({1:.4f>8}, {2:.4f>8}, {3:.4f>8})\n'.format(i, *prf)
+            info = '{0}: (P: {1:.4f}, R: {2:.4f}, F: {3:.4f})\n'.format(i, *prf)
             sys.stdout.write(info)
-        info = 'total_f1_score: {0:.4f>8}, acc: {1:.4f>8}\n'.format(group_f, acc)
+        info = 'total_f1_score: {0:.4f}, acc: {1:.4f}\n'.format(group_f, acc)
         sys.stdout.write(info)
         sys.stdout.flush()
-
-        logs = {'val_acc': acc, 'fmeasure': group_f, 'val_loss': val_loss}
+        logs['val_acc'] = acc
+        logs['fmeasure'] = group_f
+        logs['val_loss'] = val_loss
         super(PRFAcc, self).on_epoch_end(epoch, logs)
 
 

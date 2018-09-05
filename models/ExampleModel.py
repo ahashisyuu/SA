@@ -105,15 +105,19 @@ class ExampleModel:
                     batch_size=64, valid_batch_size=128, epochs=30, verbose=1,
                     validation_data=None, callbacks=None, monitor='val_loss',
                     load_model_name=None):
-        if os.path.exists('./models/save_model_' + self.__class__.__name__) is False:
-            os.mkdir('./models/save_model_' + self.__class__.__name__)
+        path_root = './models/save_model_' + self.__class__.__name__
+        if os.path.exists(path_root) is False:
+            os.mkdir(path_root)
+        path = os.path.join(path_root, arrangement)
+        if os.path.exists(path) is False:
+            os.mkdir(path)
 
         if load_model_name is not None:
-            filepath = os.path.join('./models/save_model_' + self.__class__.__name__, load_model_name)
+            filepath = os.path.join(path, load_model_name)
             self.model.load_weight(filepath)
 
         if callbacks is None:
-            save_path = './models/save_model_' + self.__class__.__name__ + arrangement \
+            save_path = path \
                         + '/epoch{epoch}_loss{loss:.4f}_valloss{val_loss:.4f}' \
                           '_fmeasure{fmeasure:.4f}_valacc{val_acc:.4f}.model'
             callbacks = [TensorBoard(write_graph=True, histogram_freq=0),
@@ -123,7 +127,7 @@ class ExampleModel:
                                 arrangement_index=self.arrangement_index,
                                 validation_data=validation_data)]
 
-        self.model.fit(train_data, train_label,
+        self.model.fit(train_data[0][:10000], train_label[:10000],
                        batch_size=batch_size,
                        epochs=epochs,
                        verbose=verbose,
@@ -134,7 +138,7 @@ class ExampleModel:
         return self.model.predict(test_data, batch_size=pre_batch_size, verbose=verbose)
 
     def load_weights(self, filepath):
-        self.model.load_weight(os.path.join('./models/save_model_', filepath))
+        self.model.load_weight(filepath)
 
     @property
     def name(self):

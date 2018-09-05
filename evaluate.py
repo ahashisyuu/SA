@@ -2,7 +2,7 @@ import numpy as np
 
 
 def compute_loss(y_true, y_pred):
-    return np.mean(np.sum(y_true * np.log(y_pred), axis=-1))
+    return -np.mean(np.sum(y_true * np.log(y_pred), axis=-1))
 
 
 def binary_prf(y_true, y_pred):
@@ -11,12 +11,15 @@ def binary_prf(y_true, y_pred):
         y_pred:预测值的ndarray，形状一样
 
     """
-    TP = y_true[y_true == 1][y_pred == 1].sum()
-    TP_FP = (y_pred == 1).astype('int32').sum()
-    TP_FN = (y_true == 1).astype('int32').sum()
+    assert y_true.shape == y_pred.shape
 
-    precision = TP / TP_FP
-    recall = TP / TP_FN
+    TP = y_true[y_pred == 1].sum()
+    TP_FP = y_pred.sum()
+    TP_FN = y_true.sum()
+
+    # print(TP, TP_FP, TP_FN)
+    precision = (TP + 1) / (TP_FP + 1)
+    recall = (TP + 1) / (TP_FN + 1)
     f1_score = 2*precision*recall / (precision + recall)
 
     return precision, recall, f1_score
@@ -48,7 +51,7 @@ def categorical_prf(y_true, y_pred):
 
     group_f /= class_num
 
-    acc = (y_pred_index == y_true_index).astype('int32').sum()
+    acc = np.mean((y_pred_index == y_true_index).astype('int32'))
 
     return group_prf, group_f, acc
 

@@ -78,10 +78,10 @@ class MainModel:
                          need_summary=self.config.need_summary,
                          vector_trainable=self.config.vector_trainable)
 
+        path = './models/save_model_' + model.name + '/' + self.config.arrangement
         if self.config.model_name is not None:
-            model.load_weights(self.config.model_name)
+            model.load_weights(os.path.join(path, self.config.model_name))
         elif load_best_model is True:
-            path = './models/save_model_' + model.name
             final_name = find_best_model(path, monitor=self.config.monitor)
             print('模型全名为：%s' % final_name)
             model_path = os.path.join(path, final_name)
