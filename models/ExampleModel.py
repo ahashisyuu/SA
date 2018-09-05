@@ -127,7 +127,7 @@ class ExampleModel:
                                 arrangement_index=self.arrangement_index,
                                 validation_data=validation_data)]
 
-        self.model.fit(train_data[0][:10000], train_label[:10000],
+        self.model.fit(train_data, train_label,
                        batch_size=batch_size,
                        epochs=epochs,
                        verbose=verbose,
