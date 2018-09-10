@@ -127,7 +127,7 @@ class ExampleModel:
                                 batch_size=valid_batch_size,
                                 arrangement_index=self.arrangement_index,
                                 validation_data=validation_data),
-                         EarlyStopping(monitor=monitor, min_delta=0.01, patience=5)]
+                         EarlyStopping(monitor=monitor, min_delta=0.01, patience=5, mode='max')]
 
         self.model.fit(train_data, train_label,
                        batch_size=batch_size,
