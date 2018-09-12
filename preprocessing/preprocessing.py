@@ -95,9 +95,13 @@ def preprocessing(args):
         为了方便分类器选择，要生成一个如{‘层次名’: 序号}的字典，方便训练
 
     """
+    print('-----  开始分词  -----')
     trainingset, validationset, testa = tokenizor()   # pandas
+    print('-----  分词结束  -----')
+    print('---------------------')
 
     # get arrangement_map
+    print('start getting arrangement_map!!!\n')
     keys_list = trainingset.keys().tolist()[2:]
     arrangement_map = {key: i for i, key in enumerate(keys_list)}
     map_name = os.path.join('./data', 'arrangement_map.pkl')
@@ -113,17 +117,20 @@ def preprocessing(args):
     validationset['content'].apply(word_count, args=(count_dic,))
 
     # get vector dict
+    print('start getting vector dict\n')
     word_vector_name = os.path.join('./rawData', 'sgns.merge.word')
     with open(word_vector_name, 'r', encoding='utf-8') as fr:
         vec_dic = get_vec_dic(fr)
 
     # get word2index
+    print('start getting word2index!!!\n')
     word2index, drop_word = process_dic(dic_count=count_dic, vec_dic=vec_dic)
     word2index_name = os.path.join('./data', 'word2index.pkl')
     with open(word2index_name, 'wb') as fw:
         pkl.dump([word2index, drop_word], fw)
 
     # get embedding matrix
+    print('start getting embedding matrix\n')
     embedding_matrix = np.random.randn(len(word2index) + 1, 300)
     for key, index in word2index.items():
         if key == '<unk>':
@@ -136,11 +143,13 @@ def preprocessing(args):
         pkl.dump(embedding_matrix, fw)
 
     # replace data
+    print('start translating word to index!!!\n')
     trainingset['content'] = trainingset['content'].apply(ConvertToENG, args=(word2index, drop_word))
     validationset['content'] = validationset['content'].apply(ConvertToENG, args=(word2index, drop_word))
     testa['content'] = testa['content'].apply(ConvertToENG, args=(word2index, drop_word))
 
-    # make label input
+    # make arrangement input
+    print('start making arrangement input\n')
     keys = []
     for key in keys_list:
         key_ = []
@@ -150,7 +159,7 @@ def preprocessing(args):
             else:
                 key_.append(word2index['<unk>'])
 
-        while len(key_) < 4:
+        while len(key_) < 5:
             key_.append(0)
         keys.append(key_)
 
@@ -162,6 +171,7 @@ def preprocessing(args):
         val_keys.append(np.asarray([key]*len(validationset['content'])))
         testa_keys.append(np.asarray([key]*len(testa['content'])))
 
+    print('start saving overall data\n')
     trainingset_data = [make_input_list(trainingset['content'], max_len=args.max_len) + train_keys,
                         make_output_list(trainingset.iloc[:, 2:], arrangement_map)]
     validationset_data = [make_input_list(validationset['content'], max_len=args.max_len) + val_keys,
@@ -170,6 +180,8 @@ def preprocessing(args):
 
     with open(os.path.join('./data', 'dataset.pkl'), 'wb') as fw:
         pkl.dump([trainingset_data, validationset_data, testa_data], fw)
+
+    print('saving data successfully')
 
     return None
 

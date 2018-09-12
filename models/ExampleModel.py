@@ -49,7 +49,7 @@ class ExampleModel:
         if self.need_char_level:
             self.doc_char = Input(shape=[self.max_len, self.max_char_len], dtype='int32')
 
-        self.arrangement = Input(shape=[4, ], dtype='int32')
+        self.arrangement = Input(shape=[5, ], dtype='int32')
 
     def embedding_vector(self):
         embed = Embedding(input_dim=self.embedding_matrix.shape[0],
@@ -93,10 +93,10 @@ class ExampleModel:
         assert len(output_shape) == 2 and output_shape[1] == self.class_num, \
             'output的形状必需是（B, class_num），但得到的是：（{0}， {1}）'.format(*output_shape)
         if self.need_char_level:
-            self.model = Model(inputs=[self.document, self.doc_char],
+            self.model = Model(inputs=[self.document, self.arrangement, self.doc_char],
                                outputs=[self.output])
         else:
-            self.model = Model(inputs=[self.document], outputs=[self.output])
+            self.model = Model(inputs=[self.document, self.arrangement], outputs=[self.output])
         self.model.compile(optimizer=self.optimizer, loss=self.loss,
                            metrics=self.metrics)
 
