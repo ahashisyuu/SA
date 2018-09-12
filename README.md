@@ -6,7 +6,7 @@
 
 （2）**data**文件夹是已经处理好的数据文件；  
 （3）**preprocessing**文件夹包含数据预处理的一些文件；  
-（3）要得到处理好的数据可以直接运行**preprocessing**文件夹内的preprocessing.py文件,或者在当前命令行执行以下指令：  
+（3）要得到处理好的数据可以直接在当前命令行执行以下指令：  
 
     python run.py --mode prepare   
 

@@ -38,8 +38,8 @@ def tokenize(content, filters='！!“”"#$%&（）()*+,，-。、./:：；;‘
 
 
 def tokenizor():
-    old_path = '../rawData'
-    new_path = '../data'
+    old_path = './rawData'
+    new_path = './data'
 
     if not os.path.exists(old_path):
         os.mkdir(old_path)
@@ -100,8 +100,8 @@ def preprocessing(args):
     # get arrangement_map
     keys_list = trainingset.keys().tolist()[2:]
     arrangement_map = {key: i for i, key in enumerate(keys_list)}
-    map_name = os.path.join('../data', 'arrangement_map.pkl')
-    keys_list_name = os.path.join('../data', 'keys_list.txt')
+    map_name = os.path.join('./data', 'arrangement_map.pkl')
+    keys_list_name = os.path.join('./data', 'keys_list.txt')
     with open(map_name, 'wb') as fw, open(keys_list_name, 'w') as fw2:
         pkl.dump(arrangement_map, fw)
 
@@ -113,13 +113,13 @@ def preprocessing(args):
     validationset['content'].apply(word_count, args=(count_dic,))
 
     # get vector dict
-    word_vector_name = os.path.join('../rawData', 'sgns.merge.word')
+    word_vector_name = os.path.join('./rawData', 'sgns.merge.word')
     with open(word_vector_name, 'r', encoding='utf-8') as fr:
         vec_dic = get_vec_dic(fr)
 
     # get word2index
     word2index, drop_word = process_dic(dic_count=count_dic, vec_dic=vec_dic)
-    word2index_name = os.path.join('../data', 'word2index.pkl')
+    word2index_name = os.path.join('./data', 'word2index.pkl')
     with open(word2index_name, 'wb') as fw:
         pkl.dump([word2index, drop_word], fw)
 
@@ -131,7 +131,7 @@ def preprocessing(args):
         embedding_matrix[index] = vec_dic[key]
     embedding_matrix[0] = np.zeros((300,))
 
-    embedding_matrix_name = os.path.join('../data', 'embedding_matrix.pkl')
+    embedding_matrix_name = os.path.join('./data', 'embedding_matrix.pkl')
     with open(embedding_matrix_name, 'wb') as fw:
         pkl.dump(embedding_matrix, fw)
 
@@ -168,7 +168,7 @@ def preprocessing(args):
                           make_output_list(validationset.iloc[:, 2:], arrangement_map)]
     testa_data = [make_input_list(testa['content'], max_len=args.max_len) + testa_keys, []]
 
-    with open(os.path.join('../data', 'dataset.pkl'), 'wb') as fw:
+    with open(os.path.join('./data', 'dataset.pkl'), 'wb') as fw:
         pkl.dump([trainingset_data, validationset_data, testa_data], fw)
 
     return None
