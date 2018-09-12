@@ -29,7 +29,9 @@ class ExampleModel:
 
         # =====  一些必要的层初始化  =====
         self.document = None
+        self.arrangement = None
         self.embedded_doc = None
+        self.embedded_arrangement = None
         self.doc = None
         self.model = None
         self.doc_char = None
@@ -46,20 +48,19 @@ class ExampleModel:
         self.document = Input(shape=[self.max_len, ], dtype='int32')
         if self.need_char_level:
             self.doc_char = Input(shape=[self.max_len, self.max_char_len], dtype='int32')
-        # self.feature = Input(shape=[self.max_len,], dtype='float32')
+
+        self.arrangement = Input(shape=[4, ], dtype='int32')
 
     def embedding_vector(self):
-        self.embedded_doc = Embedding(input_dim=self.embedding_matrix.shape[0],
-                                      output_dim=self.embedding_matrix.shape[1],
-                                      mask_zero=True,
-                                      weights=[self.embedding_matrix],
-                                      trainable=self.trainable)(self.document)
+        embed = Embedding(input_dim=self.embedding_matrix.shape[0],
+                          output_dim=self.embedding_matrix.shape[1],
+                          mask_zero=True,
+                          weights=[self.embedding_matrix],
+                          trainable=self.trainable)
+        self.embedded_doc = embed(self.document)
+        self.embedded_arrangement = embed(self.arrangement)
         if self.need_char_level:
-            self.embedded_doc_char = Embedding(input_dim=self.char_embedding_matrix.shape[0],
-                                               output_dim=self.char_embedding_matrix.shape[1],
-                                               mask_zero=True,
-                                               weights=[self.embedding_matrix],
-                                               trainable=self.trainable)(self.doc_char)
+            self.embedded_doc_char = embed(self.doc_char)
             self.processed_char = self.process_char(self.embedded_doc_char)
             self.doc = concatenate([self.embedded_doc, self.processed_char], axis=-1)
         else:
@@ -81,6 +82,7 @@ class ExampleModel:
             模型运算主体
             输入：doc: 词向量序列，形状为(Batch_size, max_len, dimensions)
             输出：output: 类别预测，为经过softmax运算得到的概率值，形状为(Batch_size, class_num)
+            注：可将self.arrangement参数用于attention
 
         """
         # return output
@@ -127,7 +129,7 @@ class ExampleModel:
                                 batch_size=valid_batch_size,
                                 arrangement_index=self.arrangement_index,
                                 validation_data=validation_data),
-                         EarlyStopping(monitor=monitor, min_delta=0.01, patience=5, mode='max')]
+                         EarlyStopping(monitor=monitor, min_delta=0.0001, patience=5, mode='max')]
 
         self.model.fit(train_data, train_label,
                        batch_size=batch_size,

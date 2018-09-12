@@ -48,7 +48,8 @@ class MainModel:
                          vector_trainable=self.config.vector_trainable)
 
         validationset = [validationset[0], validationset[1][self.arrangement_index]]
-        model.train_model(trainingset[0], trainingset[1][self.arrangement_index],
+        model.train_model([trainingset[0][0], trainingset[0][self.arrangement_index]],
+                          trainingset[1][self.arrangement_index],
                           arrangement=self.config.arrangement,
                           batch_size=self.config.batch_size,
                           valid_batch_size=self.config.valid_batch_size,

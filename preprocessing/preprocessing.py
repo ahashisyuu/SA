@@ -124,7 +124,7 @@ def preprocessing(args):
         pkl.dump([word2index, drop_word], fw)
 
     # get embedding matrix
-    embedding_matrix = np.random.randn(len(word2index), 300)
+    embedding_matrix = np.random.randn(len(word2index) + 1, 300)
     for key, index in word2index.items():
         if key == '<unk>':
             continue
@@ -140,11 +140,33 @@ def preprocessing(args):
     validationset['content'] = validationset['content'].apply(ConvertToENG, args=(word2index, drop_word))
     testa['content'] = testa['content'].apply(ConvertToENG, args=(word2index, drop_word))
 
-    trainingset_data = [make_input_list(trainingset['content'], max_len=args.max_len),
+    # make label input
+    keys = []
+    for key in keys_list:
+        key_ = []
+        for word in key.split('_'):
+            if word in word2index:
+                key_.append(word2index[word])
+            else:
+                key_.append(word2index['<unk>'])
+
+        while len(key_) < 4:
+            key_.append(0)
+        keys.append(key_)
+
+    train_keys = []
+    val_keys = []
+    testa_keys = []
+    for key in keys:
+        train_keys.append(np.asarray([key]*len(trainingset['content'])))
+        val_keys.append(np.asarray([key]*len(validationset['content'])))
+        testa_keys.append(np.asarray([key]*len(testa['content'])))
+
+    trainingset_data = [make_input_list(trainingset['content'], max_len=args.max_len) + train_keys,
                         make_output_list(trainingset.iloc[:, 2:], arrangement_map)]
-    validationset_data = [make_input_list(validationset['content'], max_len=args.max_len),
+    validationset_data = [make_input_list(validationset['content'], max_len=args.max_len) + val_keys,
                           make_output_list(validationset.iloc[:, 2:], arrangement_map)]
-    testa_data = [make_input_list(testa['content'], max_len=args.max_len), []]
+    testa_data = [make_input_list(testa['content'], max_len=args.max_len) + testa_keys, []]
 
     with open(os.path.join('../data', 'dataset.pkl'), 'wb') as fw:
         pkl.dump([trainingset_data, validationset_data, testa_data], fw)
