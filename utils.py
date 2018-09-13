@@ -125,6 +125,7 @@ class PRFAcc(ModelCheckpoint):
         logs['fmeasure'] = group_f
         logs['val_loss'] = val_loss
         super(PRFAcc, self).on_epoch_end(epoch, logs)
+        print('\n\n')
 
     def on_train_end(self, logs=None):
         self.epoch_info_file.close()
